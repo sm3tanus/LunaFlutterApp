@@ -1,22 +1,22 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:luna/classes/movingUser.dart';
 import 'package:toast/toast.dart';
 
-class AuthPage extends StatefulWidget {
-  const AuthPage({super.key});
+class RegPage extends StatefulWidget {
+  const RegPage({super.key});
 
   @override
-  State<AuthPage> createState() => _AuthPageState();
+  State<RegPage> createState() => _RegPageState();
 }
 
-class _AuthPageState extends State<AuthPage> {
+class _RegPageState extends State<RegPage> {
   TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  TextEditingController _passwordFirstController = TextEditingController();
+  TextEditingController _passwordSecondController = TextEditingController();
 
-
+  @override
   Widget build(BuildContext context) {
-    ToastContext().init(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -65,7 +65,7 @@ class _AuthPageState extends State<AuthPage> {
                         ),
                       ),
                       child: Text(
-                        'ДОБРО ПОЖАЛОВАТЬ,',
+                        'ЗАПОЛНИТЕ',
                         style: TextStyle(
                             fontSize: 16,
                             color: Colors.black,
@@ -108,7 +108,7 @@ class _AuthPageState extends State<AuthPage> {
                   width: MediaQuery.of(context).size.width / 1.1,
                   height: 50,
                   child: TextField(
-                    controller: _passwordController,
+                    controller: _passwordFirstController,
                     obscureText: true,
                     decoration: InputDecoration(
                       focusedBorder: OutlineInputBorder(
@@ -134,114 +134,86 @@ class _AuthPageState extends State<AuthPage> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: 30),
-                  width: MediaQuery.of(context).size.width,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            'Забыли пароль?',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                  margin: EdgeInsets.only(top: 20),
+                  width: MediaQuery.of(context).size.width / 1.1,
+                  height: 50,
+                  child: TextField(
+                    controller: _passwordSecondController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.black,
+                          width: 1.0,
                         ),
                       ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            final auth = Authentication(FirebaseAuth.instance);
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.black,
+                          width: 1.0,
+                        ),
+                      ),
+                      labelText: 'Повторите пароль',
+                      labelStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(top: 20),
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (_passwordFirstController.text == _passwordSecondController.text &&
+                              _passwordFirstController.text != '' &&
+                              _emailController.text != '') {
+                            final auth = Registration(FirebaseAuth.instance,
+                                context: null);
 
                             final credential =
-                                await auth.signInWithEmailAndPassword(
-                                    _emailController.text, _passwordController.text);
+                                await auth.signUpWithEmailAndPassword(
+                                    _emailController.text, _passwordSecondController.text);
                             if (credential != null) {
-                             Navigator.pushNamed(context, '/catalogPage');
-                            } else {
-                              Toast.show("Неверные данные",
-                                  backgroundColor: Colors.transparent,
-                                  textStyle: TextStyle(color: Colors.red));
+                              Navigator.pushNamed(context, '/authPage');
                             }
-                          },
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                              const Color.fromRGBO(255, 233, 0, 1),
-                            ),
-                            elevation: MaterialStateProperty.all<double>(0),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(15.0),
-                                  bottomLeft: Radius.circular(15.0),
-                                ),
+                          } else {
+                            Toast.show('Неверные данные',
+                                backgroundColor: Colors.transparent,
+                                textStyle: TextStyle(color: Colors.red));
+                          }
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                            const Color.fromRGBO(255, 233, 0, 1),
+                          ),
+                          elevation: MaterialStateProperty.all<double>(0),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(15.0),
+                                bottomLeft: Radius.circular(15.0),
                               ),
                             ),
                           ),
-                          child: Text(
-                            'ВОЙТИ',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w900,
-                            ),
+                        ),
+                        child: Text(
+                          'ЗАРЕГИСТРИРОВАТЬСЯ',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 15),
-                  height: 2,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(255, 230, 0, 1),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 5),
-                  width: MediaQuery.of(context).size.width,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/catalogPage');
-                          },
-                          child: Text(
-                            'Гость',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/registerPage');
-                          },
-                          child: Text(
-                            'Создать аккаунт',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    )
+                  ],
                 ),
                 Container(
                   margin: EdgeInsets.only(
